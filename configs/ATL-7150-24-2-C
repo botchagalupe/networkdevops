@@ -1,0 +1,126 @@
+! device: ATL-7150S-24-1 (DCS-7150S-24, EOS-4.11.7.1)
+!
+! boot system flash:/EOS-4.11.7.1.swi
+!
+hostname ATL-7150S-24-1
+ip name-server 192.168.99.1
+ip name-server 66.209.64.20
+ip name-server 66.209.64.21
+!
+spanning-tree mode mstp
+no spanning-tree vlan 4094
+!
+no aaa root
+!
+username admin role network-admin secret 5 $1$hMBV1vV6$VaInHOrQ1OKaMWzZucmao.
+!
+vlan 50
+   name atl-vlan50
+   trunk group LV-1
+!
+vlan 51
+   name atl-vlan51
+   trunk group LV-1
+!
+vlan 52
+   name atl-vlan52
+   trunk group LV-1
+!
+vlan 53
+   name atl-vlan53
+   trunk group LV-1
+!
+vlan 54
+   name atl-vlan54
+   trunk group LV-1
+!
+vlan 4094
+   trunk group mlagpeer
+!
+interface Port-Channel1
+   mlag 1
+!
+interface Port-Channel100
+   switchport trunk allowed vlan 50-54,4094
+   switchport mode trunk
+   switchport trunk group LV-1
+   switchport trunk group mlagpeer
+!
+interface Ethernet1
+   switchport trunk allowed vlan 50-54
+   switchport mode trunk
+   switchport trunk group LV-1
+   channel-group 100 mode active
+!
+interface Ethernet2
+   switchport trunk allowed vlan 50-54
+   switchport mode trunk
+   switchport trunk group LV-1
+   channel-group 100 mode active
+!
+interface Ethernet3
+!
+interface Ethernet4
+!
+interface Ethernet5
+!
+interface Ethernet6
+!
+interface Ethernet7
+!
+interface Ethernet8
+!
+interface Ethernet9
+!
+interface Ethernet10
+!
+interface Ethernet11
+!
+interface Ethernet12
+!
+interface Ethernet13
+!
+interface Ethernet14
+!
+interface Ethernet15
+!
+interface Ethernet16
+!
+interface Ethernet17
+!
+interface Ethernet18
+!
+interface Ethernet19
+!
+interface Ethernet20
+!
+interface Ethernet21
+!
+interface Ethernet22
+!
+interface Ethernet23
+!
+interface Ethernet24
+   channel-group 1 mode active
+!
+interface Management1
+   ip address 192.168.99.65/24
+!
+interface Vlan4094
+   no autostate
+   ip address 10.0.0.2/30
+!
+ip route 0.0.0.0/0 192.168.99.1
+!
+no ip routing
+!
+mlag configuration
+   domain-id mlag1
+   heartbeat-interval 2500
+   local-interface Vlan4094
+   peer-address 10.0.0.1
+   peer-link Port-Channel100
+   reload-delay 150
+!
+!
+end
