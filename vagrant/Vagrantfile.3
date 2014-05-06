@@ -1,0 +1,58 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.require_plugin "vagrant-berkshelf"
+#Vagrant.require_plugin "vagrant-vmware-fusion"
+
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  # All Vagrant configuration is done here. The most common configuration
+  # options are documented and commented below. For a complete reference,
+  # please see the online documentation at vagrantup.com.
+
+  config.vm.provider "vmware_fusion" do |v|
+    v.vmx.memsize = 8192
+    v.vmx.numvcpus = 2
+  end
+
+  config.vm.provider "virtualbox" do |v|
+    v.name = "stateless_nea_server"
+    v.memory = 8192
+  end
+
+  # config.vm.provider "vsphere" do |vsphere|
+  #   vsphere.host = '192.168.96.13'
+  #   vsphere.compute_resource_name = 'YOUR COMPUTE RESOURCE'
+  #   vsphere.resource_pool_name = 'YOUR RESOURCE POOL'
+  #   vsphere.template_name = 'YOUR VM TEMPLATE'
+  #   vsphere.name = 'NEW VM NAME'
+  #   vsphere.user = 'Administrator'
+  #   vsphere.password = 'PASSW0RDone'
+  # end
+
+  config.berkshelf.enabled = true
+  config.berkshelf.berksfile_path = "./chef/Berksfile"
+
+  config.vm.box = "precise64-langs"
+  config.vm.box_url = "https://stateless-base-vm.s3.amazonaws.com/precise64-langs.box"
+
+  config.vm.provision :chef_solo do |chef|
+    chef.cookbooks_path = "./chef/cookbooks"
+
+    chef.roles_path = "./chef/roles"
+
+    ["stateless-server-base", "stateless-server-monitoring"].each do |role|
+      chef.add_role role
+    end
+  end
+
+  config.vm.network "private_network", ip: "192.168.56.10", netmask: "255.255.255.0"
+
+  config.vm.network :forwarded_port, guest: 5000, host: 5000
+  config.vm.network :forwarded_port, guest: 9292, host: 9292
+  config.vm.network :forwarded_port, guest: 5010, host: 5010
+  config.vm.network :forwarded_port, guest: 5011, host: 5011
+end
