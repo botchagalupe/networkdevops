@@ -1,19 +1,19 @@
 @slow @announce
 Feature: nmap attacks for example.com
   Background:
-    Given "nmap" is installed
+    Given "eapi" is installed
     And the following profile:
       | name           | value           |
-      | hostname       | scanme.nmap.org |
-      | tcp_ping_ports | 22,25,80,443    |
+      | switch         | ip_address      |
+      | command        | show mlag       |
 
-  Scenario: Using tcp syn ping scan and the nmap fast flag
-    When I launch an "nmap" attack with:
+  Scenario: Using mlag show check connectivity of the mlag pair
+
+    When I launch an "eapi" attack with:
       """
-      nmap -F -PS<tcp_ping_ports> <hostname> -oX foo.xml
+      eapi <ip_address> <command> -oX foo.out
       """
-    Then the file "foo.xml" should contain XML:
-      | css                                                         |
-      | ports port[protocol="tcp"][portid="80"] state[state="open"] |
-      | ports port[protocol="tcp"][portid="22"] state[state="open"] |
+    Then the file "foo.out" should contain:
+
+      | state[Active] status[Connected] peer-link[Up] local-int[Up] |
 
